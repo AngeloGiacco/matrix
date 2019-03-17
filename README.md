@@ -9,7 +9,7 @@ https://www.youtube.com/watch?v=S1TQCi9axzg
 Her final version can be found here:
 http://xie-emily.com/generative_art/green_rain.html
 
-I have made a version which uses the cyrillic alphabet and chinese characters.
+I have made a version which uses the cyrillic alphabet, chinese characters and numbers.
 
 Other versions that have been made:
 
