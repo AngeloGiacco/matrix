@@ -1,6 +1,6 @@
 var streams = [];
 var fadeInterval = 1.6;
-var symbolSize = 14;
+var symbolSize = 20;
 
 function setup() {
   createCanvas(
@@ -12,7 +12,7 @@ function setup() {
   var x = 0;
   for (var i = 0; i <= width / symbolSize; i++) {
     var stream = new Stream();
-    stream.generateSymbols(x, random(-2000, 0));
+    stream.generateSymbols(x, random(0, height));
     streams.push(stream);
     x += symbolSize
   }
@@ -43,13 +43,15 @@ function Symbol(x, y, speed, first, opacity) {
     var charType = round(random(0, 5));
     if (frameCount % this.switchInterval == 0) {
       if (charType > 1) {
-        // set it to Chinese
+        // set it to Russian
         this.value = String.fromCharCode(
-          x3400 + round(random(0, 96))
+          0x0410 + round(random(0, 31))
         );
       } else {
-        // set it to russian
-        this.value = round(random(0,9));
+        // set it to Chinese
+        this.value = String.fromCharCode(
+          0x3400 + round(random(0, 1000))
+        );
       }
     }
   }
