@@ -2,6 +2,16 @@ var streams = [];
 var fadeInterval = 1.6;
 var symbolSize = 20;
 var end = false;
+var message = false;
+
+function check_symbol_remains() {
+  for (var i = 0; i < streams.length; i++) {
+    if (streams[i].symbols[streams[i].symbols.length - 1].value != " ") {
+      return true;
+    }
+  }
+  return false;
+}
 
 function setup() {
   createCanvas(
@@ -15,7 +25,7 @@ function setup() {
     var stream = new Stream();
     stream.generateSymbols(x, random(0, height));
     streams.push(stream);
-    x += symbolSize
+    x += symbolSize;
   }
 
   textFont('Consolas');
@@ -27,6 +37,20 @@ function draw() {
   streams.forEach(function(stream) {
     stream.render();
   });
+  if (end) {
+    x = 0;
+    var symbols_remain = check_symbol_remains();
+    if (!symbols_remain) {
+      streams = [];
+      message = true;
+      for (i=0;i<16;i++) {
+        var stream = new Stream();
+        stream.generateSymbols(x,0);
+        streams.push(stream);
+        x += symbolSize;
+      }
+    }
+  }
 }
 
 function Symbol(x, y, speed, first, opacity) {
@@ -54,30 +78,35 @@ function Symbol(x, y, speed, first, opacity) {
           0x3400 + round(random(0, 1000))
         );
       } else {
+        // set it to numeric
         this.value = round(random(0,9));
       }
     }
   }
 
   this.rain = function() {
-    if (this.y >= height) {
+    if (this.y >= (height + 20)) {
       if (!end) {
-        //remove the symbol from the streams
-        this.value = " "
-      } else {
         this.y = 0;
+      } else if (message){
+        if (this.y >= height/2) {
+          //make the value the element of the array of the stream's index in the stream array
+        } else {
+          this.y += speed;
+        }
+      }else{
+        this.value = " ";//make this remove instead
       }
     } else {
       this.y += speed;
     }
-    this.y = (this.y >= height && !end) ? 0 : this.y += this.speed;
   }
 }
 
 function Stream() {
   this.symbols = [];
   this.totalSymbols = round(random(5, 35));
-  this.speed = random(5, 22);
+  this.speed = random(5, 15);
 
   this.generateSymbols = function(x, y) {
     var opacity = 255;
@@ -99,17 +128,15 @@ function Stream() {
   }
 
   this.render = function() {
-    this.symbols.forEach(function(symbol) {
-      if (symbol.value != " ") {
-        if (symbol.first) {
-          fill(140, 255, 170, symbol.opacity);
-        } else {
-          fill(0, 255, 70, symbol.opacity);
-        }
-        text(symbol.value, symbol.x, symbol.y);
-        symbol.rain();
-        symbol.setToRandomSymbol();
+    this.symbols.forEach(function(symbol) {//this should render if there are no undefineds
+      if (symbol.first) {
+        fill(140, 255, 170, symbol.opacity);
+      } else {
+        fill(0, 255, 70, symbol.opacity);
       }
+      text(symbol.value, symbol.x, symbol.y);
+      symbol.rain();
+      symbol.setToRandomSymbol();
     });
   }
 }
