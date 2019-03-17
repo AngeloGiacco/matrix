@@ -1,7 +1,7 @@
 var streams = [];
-var fadeInterval = document.getElementById("fade");
-var symbolSize = document.getElementById("size");
-var mean_speed = document.getElementById("speed");
+var fadeInterval = 1.6;
+var symbolSize = 20;
+var end = false;
 
 function setup() {
   createCanvas(
@@ -60,15 +60,24 @@ function Symbol(x, y, speed, first, opacity) {
   }
 
   this.rain = function() {
-    this.y = (this.y >= height) ? 0 : this.y += this.speed;
+    if (this.y >= height) {
+      if (!end) {
+        //remove the symbol from the streams
+        this.value = " "
+      } else {
+        this.y = 0;
+      }
+    } else {
+      this.y += speed;
+    }
+    this.y = (this.y >= height && !end) ? 0 : this.y += this.speed;
   }
-
 }
 
 function Stream() {
   this.symbols = [];
   this.totalSymbols = round(random(5, 35));
-  this.speed = round(random((mean_speed/2), (mean_speed*3/2)));
+  this.speed = random(5, 22);
 
   this.generateSymbols = function(x, y) {
     var opacity = 255;
@@ -91,14 +100,20 @@ function Stream() {
 
   this.render = function() {
     this.symbols.forEach(function(symbol) {
-      if (symbol.first) {
-        fill(140, 255, 170, symbol.opacity);
-      } else {
-        fill(0, 255, 70, symbol.opacity);
+      if (symbol.value != " ") {
+        if (symbol.first) {
+          fill(140, 255, 170, symbol.opacity);
+        } else {
+          fill(0, 255, 70, symbol.opacity);
+        }
+        text(symbol.value, symbol.x, symbol.y);
+        symbol.rain();
+        symbol.setToRandomSymbol();
       }
-      text(symbol.value, symbol.x, symbol.y);
-      symbol.rain();
-      symbol.setToRandomSymbol();
     });
   }
+}
+
+function keyPressed() {
+  end = true;
 }
