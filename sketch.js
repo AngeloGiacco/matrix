@@ -40,7 +40,7 @@ function Symbol(x, y, speed, first, opacity) {
   this.switchInterval = round(random(2, 25));
 
   this.setToRandomSymbol = function() {
-    var charType = round(random(0, 6));
+    var charType = round(random(0, 7));
     if (frameCount % this.switchInterval == 0) {
       if (charType > 3) {
         // set it to Russian
