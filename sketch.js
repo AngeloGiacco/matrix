@@ -40,18 +40,20 @@ function Symbol(x, y, speed, first, opacity) {
   this.switchInterval = round(random(2, 25));
 
   this.setToRandomSymbol = function() {
-    var charType = round(random(0, 5));
+    var charType = round(random(0, 6));
     if (frameCount % this.switchInterval == 0) {
-      if (charType > 1) {
+      if (charType > 3) {
         // set it to Russian
         this.value = String.fromCharCode(
           0x0410 + round(random(0, 31))
         );
-      } else {
+      } else if (charType > 1) {
         // set it to Chinese
         this.value = String.fromCharCode(
           0x3400 + round(random(0, 1000))
         );
+      } else {
+        this.value = round(random(0,9));
       }
     }
   }
