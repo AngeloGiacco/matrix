@@ -1,6 +1,7 @@
 var streams = [];
-var fadeInterval = 1.6;
-var symbolSize = 20;
+var fadeInterval = document.getElementById("fade");
+var symbolSize = document.getElementById("size");
+var mean_speed = document.getElementById("speed");
 
 function setup() {
   createCanvas(
@@ -67,7 +68,7 @@ function Symbol(x, y, speed, first, opacity) {
 function Stream() {
   this.symbols = [];
   this.totalSymbols = round(random(5, 35));
-  this.speed = random(5, 22);
+  this.speed = round(random((mean_speed/2), (mean_speed*3/2)));
 
   this.generateSymbols = function(x, y) {
     var opacity = 255;
