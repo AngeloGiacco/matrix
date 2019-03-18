@@ -2,7 +2,7 @@ var streams = [];
 var fadeInterval = 1.6;
 var symbolSize = 20;
 var end = false;
-var message = false;
+var create_message = false;
 
 function check_symbol_remains() {
   for (var i = 0; i < streams.length; i++) {
@@ -33,23 +33,33 @@ function setup() {
 }
 
 function draw() {
-  background(0, 150);
-  streams.forEach(function(stream) {
-    stream.render();
-  });
-  if (end) {
+  if (check_symbol_remains()) {
+    background(0, 150);
+  } else {
+    background(0);
+  }
+  if (end && !check_symbol_remains() && create_message) {
     x = 0;
-    var symbols_remain = check_symbol_remains();
-    if (!symbols_remain) {
-      streams = [];
-      message = true;
-      for (i=0;i<16;i++) {
-        var stream = new Stream();
-        stream.generateSymbols(x,0);
-        streams.push(stream);
-        x += symbolSize;
-      }
+    symbolSize = window.innerWidth / 19;
+    streams = [];
+    for (var i = 0; i < window.innerWidth / symbolSize; i++) {
+      stream = new Stream();
+      stream.generateSymbols(x,0);
+      streams.push(stream);
+      x += symbolSize;
     }
+    create_message = false;
+  }
+
+  for (var i = 0; i < streams.length;i++) {
+    if (end && !create_message) {
+      console.log(streams[i]);
+      text(streams[i].symbols[0],i * 20, window.innerHeight/2);
+
+    }
+  }
+  for (var i = 0; i < streams.length;i++) {
+    streams[i].render();
   }
 }
 
@@ -67,6 +77,9 @@ function Symbol(x, y, speed, first, opacity) {
   this.setToRandomSymbol = function() {
     var charType = round(random(0, 7));
     if (frameCount % this.switchInterval == 0) {
+      if (end && !create_message) {
+        console.log("assigning value");
+      }
       if (charType > 3) {
         // set it to Russian
         this.value = String.fromCharCode(
@@ -88,14 +101,13 @@ function Symbol(x, y, speed, first, opacity) {
     if (this.y >= (height + 20)) {
       if (!end) {
         this.y = 0;
-      } else if (message){
-        if (this.y >= height/2) {
-          //make the value the element of the array of the stream's index in the stream array
+        if (!check_symbol_remains()) {
+
         } else {
           this.y += speed;
         }
       }else{
-        this.value = " ";//make this remove instead
+        this.value = " ";
       }
     } else {
       this.y += speed;
@@ -105,13 +117,17 @@ function Symbol(x, y, speed, first, opacity) {
 
 function Stream() {
   this.symbols = [];
-  this.totalSymbols = round(random(5, 35));
+  if (create_message) {
+    this.totalSymbols = 1;
+  } else {
+    this.totalSymbols = round(random(5, 35));
+  }
   this.speed = random(5, 15);
 
   this.generateSymbols = function(x, y) {
     var opacity = 255;
     var first = round(random(0, 4)) == 1;
-    for (var i =0; i <= this.totalSymbols; i++) {
+    for (var i =0; i < this.totalSymbols; i++) {
       symbol = new Symbol(
         x,
         y,
@@ -128,7 +144,6 @@ function Stream() {
   }
 
   this.render = function() {
-    this.symbols.forEach(function(symbol) {//this should render if there are no undefineds
       if (symbol.first) {
         fill(140, 255, 170, symbol.opacity);
       } else {
@@ -143,4 +158,5 @@ function Stream() {
 
 function keyPressed() {
   end = true;
+  create_message = true;
 }
