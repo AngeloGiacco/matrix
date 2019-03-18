@@ -1,31 +1,32 @@
-var streams = [];
-var fadeInterval = 1.6;
-var symbolSize = 20;
-var end = false;
-var create_message = false;
+var streams = []; //creating streams array
+var fadeInterval = 1.6; //reduces opacity over time
+var symbolSize = 20; //font size
+var end = false; //true when key pressed
+var create_message = false; //true when key pressed until final message initiated
+var message = false; //true when final message initiated
 
 function check_symbol_remains() {
   for (var i = 0; i < streams.length; i++) {
-    if (streams[i].symbols[streams[i].symbols.length - 1].value != " ") {
-      return true;
+    if (streams[i].symbols[streams[i].symbols.length - 1].value != " ") { //checks if any strings still have elements
+      return true;//returns true if symbols remain
     }
   }
-  return false;
+  return false;//if nothing returned, no symbols, returns false
 }
 
 function setup() {
   createCanvas(
     window.innerWidth,
     window.innerHeight
-  );
-  background(0);
+  ); //creates background fullscreen
+  background(0); //black background
 
-  var x = 0;
-  for (var i = 0; i <= width / symbolSize; i++) {
-    var stream = new Stream();
-    stream.generateSymbols(x, random(0, height));
-    streams.push(stream);
-    x += symbolSize;
+  var x = 0; //first stream all the way over on far left
+  for (var i = 0; i <= width / symbolSize; i++) { //width divided by symbolSize is number of Streams that will be created
+    var stream = new Stream();//initialises new stream object
+    stream.generateSymbols(x, random(0, height));//generates a symbol at the x position and random height
+    streams.push(stream);//adds stream to stream array
+    x += symbolSize;//moves to the right
   }
 
   textFont('Consolas');
@@ -33,38 +34,36 @@ function setup() {
 }
 
 function draw() {
-  if (check_symbol_remains()) {
+  if (check_symbol_remains()) { //if there are still symbols, opacity helps blur
     background(0, 150);
-  } else {
+  } else { //removes opacity if there are no more symbols, otherwise can still be seen
     background(0);
   }
-  if (end && !check_symbol_remains() && create_message) {
-    x = 0;
-    symbolSize = window.innerWidth / 19;
-    streams = [];
-    for (var i = 0; i < window.innerWidth / symbolSize; i++) {
-      stream = new Stream();
-      stream.generateSymbols(x,0);
-      streams.push(stream);
-      x += symbolSize;
+  if (end && !check_symbol_remains() && create_message) { //if the message not yet created
+    x = 0; //set x to zero
+    symbolSize = window.innerWidth / 19;//we only want 19 streams of 1 symbol
+    streams = [];//remove all streams from stream array
+    for (var i = 0; i < window.innerWidth / symbolSize; i++) { //iterates 19 times
+      stream = new Stream();//creates new stream object
+      stream.generateSymbols(x,0);//must start at the top
+      streams.push(stream);//adds new stream to the stream array
+      x += symbolSize;//shifts to the right
     }
-    create_message = false;
+    create_message = false;//message created so set to false
   }
 
-  for (var i = 0; i < streams.length;i++) {
+  for (var i = 0; i < streams.length;i++) { //just for debugging purposes
     if (end && !create_message) {
       console.log(streams[i]);
-      text(streams[i].symbols[0],i * 20, window.innerHeight/2);
-
     }
   }
-  for (var i = 0; i < streams.length;i++) {
-    streams[i].render();
+  for (var i = 0; i < streams.length;i++) {//renders each stream
+    streams[i].render();//render code CAUSES ERROR
   }
 }
 
 function Symbol(x, y, speed, first, opacity) {
-  this.x = x;
+  this.x = x;//initialises Symbol attributes
   this.y = y;
   this.value;
 
@@ -72,23 +71,23 @@ function Symbol(x, y, speed, first, opacity) {
   this.first = first;
   this.opacity = opacity;
 
-  this.switchInterval = round(random(2, 25));
+  this.switchInterval = round(random(5, 30)); //sets how many frames required for a new symbol value
 
   this.setToRandomSymbol = function() {
-    var charType = round(random(0, 7));
+    var charType = round(random(0, 7)); //creates a random int between 0 and 7
     if (frameCount % this.switchInterval == 0) {
-      if (end && !create_message) {
+      if (end && !create_message) {//debugging again
         console.log("assigning value");
       }
       if (charType > 3) {
         // set it to Russian
         this.value = String.fromCharCode(
-          0x0410 + round(random(0, 31))
+          0x0410 + round(random(0, 31))//unicode for a random russian character
         );
       } else if (charType > 1) {
         // set it to Chinese
         this.value = String.fromCharCode(
-          0x3400 + round(random(0, 1000))
+          0x3400 + round(random(0, 1000))//unicode for some chinese characters
         );
       } else {
         // set it to numeric
@@ -97,26 +96,23 @@ function Symbol(x, y, speed, first, opacity) {
     }
   }
 
-  this.rain = function() {
-    if (this.y >= (height + 20)) {
-      if (!end) {
-        this.y = 0;
-        if (!check_symbol_remains()) {
-
-        } else {
-          this.y += speed;
-        }
-      }else{
+  this.rain = function() {//causes the falling appearance
+    if (this.y >= (height + 20)) {//if y value is more than 20px off screen
+      if (!end) { //if a key has not been pressed
+        this.y = 0;//send it to the top
+      }else if (!message) { //if this is not the final message
         this.value = " ";
       }
+    } else if (message && this.y > height/2){ //if the message has been created and the stream is past halfway
+      //set the symbols value to the appropriate character of the message
     } else {
-      this.y += speed;
+      this.y += speed; //lower y coordinate by the speed
     }
   }
 }
 
 function Stream() {
-  this.symbols = [];
+  this.symbols = [];//create symbols array
   if (create_message) {
     this.totalSymbols = 1;
   } else {
