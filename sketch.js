@@ -114,15 +114,15 @@ function Symbol(x, y, speed, first, opacity) {
 function Stream() {
   this.symbols = [];//create symbols array
   if (create_message) {
-    this.totalSymbols = 1;
+    this.totalSymbols = 1;//message should only have one symbol
   } else {
-    this.totalSymbols = round(random(5, 35));
+    this.totalSymbols = round(random(5, 35));//matrix shoud have a random number
   }
-  this.speed = random(5, 15);
+  this.speed = random(5, 15);//random speed
 
   this.generateSymbols = function(x, y) {
     var opacity = 255;
-    var first = round(random(0, 4)) == 1;
+    var first = round(random(0, 4)) == 1;//1 in 5 chance of first symbol in stream being brighter
     for (var i =0; i < this.totalSymbols; i++) {
       symbol = new Symbol(
         x,
@@ -130,30 +130,30 @@ function Stream() {
         this.speed,
         first,
         opacity
-      );
-      symbol.setToRandomSymbol();
-      this.symbols.push(symbol);
-      opacity -= (255 / this.totalSymbols) / fadeInterval;
-      y -= symbolSize;
-      first = false;
+      ); //initialise new symbols
+      symbol.setToRandomSymbol();//set symbol to have a random value
+      this.symbols.push(symbol);//add symbol to array
+      opacity -= (255 / this.totalSymbols) / fadeInterval; //reduce opacity each time by factor of the fadeInterval
+      y -= symbolSize;//symbol is moved up by the symbol size, first should be lowest down
+      first = false;//first is automatically false for all other symbols apart from first one
     }
   }
 
   this.render = function() {
     this.symbols.forEach(function(symbol) {
-      if (symbol.first) {
+      if (symbol.first) { //change brightness based on first variable
         fill(140, 255, 170, symbol.opacity);
       } else {
         fill(0, 255, 70, symbol.opacity);
       }
-      text(symbol.value, symbol.x, symbol.y);
-      symbol.rain();
-      symbol.setToRandomSymbol();
+      text(symbol.value, symbol.x, symbol.y);//show symbol as text
+      symbol.rain();//lower and create loop effect;
+      symbol.setToRandomSymbol();//change to different symbols
     });
   }
 }
 
-function keyPressed() {
+function keyPressed() {//if key pressed, set variables to true
   end = true;
   create_message = true;
 }
