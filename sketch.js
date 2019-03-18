@@ -144,6 +144,7 @@ function Stream() {
   }
 
   this.render = function() {
+    this.symbols.forEach(function(symbol) {
       if (symbol.first) {
         fill(140, 255, 170, symbol.opacity);
       } else {
