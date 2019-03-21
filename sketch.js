@@ -1,18 +1,18 @@
+//MUST get values from slider and update reset function
+//also introduce end function
+//finally implement message 
+
+
 var streams = []; //creating streams array
 var fadeInterval = 1.6; //reduces opacity over time
 var symbolSize = 20; //font size
-var end = false; //true when key pressed
-var create_message = false; //true when key pressed until final message initiated
-var message = false; //true when final message initiated
 
-function check_symbol_remains() {
-  for (var i = 0; i < streams.length; i++) {
-    if (streams[i].symbols[streams[i].symbols.length - 1].value != " ") { //checks if any strings still have elements
-      return true;//returns true if symbols remain
-    }
-  }
-  return false;//if nothing returned, no symbols, returns false
-}
+let fadeSlider;
+let symbolSizeSlider;
+let maxSymbolSlider;
+let minSymbolSlider;
+let minSpeedSlider;
+let maxSpeedSlider;
 
 function setup() {
   createCanvas(
@@ -20,6 +20,34 @@ function setup() {
     window.innerHeight
   ); //creates background fullscreen
   background(0); //black background
+
+  fadeSlider = createSlider(1, 4, 2, 0);
+  fadeSlider.position(20,20);
+  symbolSizeSlider = createSlider(5,40,20,0);
+  symbolSizeSlider.position(20,50);
+  minSymbolSlider = createSlider(10,25,20,1);
+  minSymbolSlider.position(20,80);
+  maxSymbolSlider = createSlider(1,9,5,1);
+  maxSymbolSlider.position(20,110);
+  minSpeedSlider = createSlider(2,6,4,0,);
+  minSpeedSlider.position(20,140);
+  maxSpeedSlider = createSlider(8,20,15,0);
+  maxSpeedSlider.position(20,170);
+  fill(255);
+  text("fade interval", fadeSlider.x * 2 + fadeSlider.width, 35);
+  fill(255);
+  text("symbol size", symbolSizeSlider.x * 2 + symbolSizeSlider.width, 65);
+  fill(255);
+  text("min number of symbols", minSymbolSlider.x * 2 + minSymbolSlider.width, 95);
+  fill(255);
+  text("max number of symbols", maxSymbolSlider.x * 2 + maxSymbolSlider.width, 125);
+  fill(255);
+  text("min speed", minSpeedSlider.x * 2 + minSpeedSlider.width, 155);
+  fill(255);
+  text("max speed", maxSpeedSlider.x * 2 + maxSpeedSlider.width, 185);
+  button = createButton('reset');
+  button.position(20, 195);
+  button.mousePressed(reset);
 
   var x = 0; //first stream all the way over on far left
   for (var i = 0; i <= width / symbolSize; i++) { //width divided by symbolSize is number of Streams that will be created
@@ -31,35 +59,17 @@ function setup() {
 
   textFont('Consolas');
   textSize(symbolSize);
+
+  //creating sliders
+  //slider arguments: min, max, default, discrete
+  //if discrete is 0 slider is continuous, 1 by default means discrete
 }
 
 function draw() {
-  if (check_symbol_remains()) { //if there are still symbols, opacity helps blur
-    background(0, 150);
-  } else { //removes opacity if there are no more symbols, otherwise can still be seen
-    background(0);
-  }
-  if (end && !check_symbol_remains() && create_message) { //if the message not yet created
-    x = 0; //set x to zero
-    symbolSize = window.innerWidth / 19;//we only want 19 streams of 1 symbol
-    streams = [];//remove all streams from stream array
-    for (var i = 0; i < window.innerWidth / symbolSize; i++) { //iterates 19 times
-      stream = new Stream();//creates new stream object
-      stream.generateSymbols(x,0);//must start at the top
-      streams.push(stream);//adds new stream to the stream array
-      x += symbolSize;//shifts to the right
-    }
-    create_message = false;//message created so set to false
-  }
-
-  for (var i = 0; i < streams.length;i++) { //just for debugging purposes
-    if (end && !create_message) {
-      console.log(streams[i]);
-    }
-  }
-  for (var i = 0; i < streams.length;i++) {//renders each stream
-    streams[i].render();//render code CAUSES ERROR
-  }
+  background(0, 150);
+  streams.forEach(function(stream) {
+    stream.render();
+  });
 }
 
 function Symbol(x, y, speed, first, opacity) {
@@ -76,9 +86,6 @@ function Symbol(x, y, speed, first, opacity) {
   this.setToRandomSymbol = function() {
     var charType = round(random(0, 7)); //creates a random int between 0 and 7
     if (frameCount % this.switchInterval == 0) {
-      if (end && !create_message) {//debugging again
-        console.log("assigning value");
-      }
       if (charType > 3) {
         // set it to Russian
         this.value = String.fromCharCode(
@@ -97,27 +104,12 @@ function Symbol(x, y, speed, first, opacity) {
   }
 
   this.rain = function() {//causes the falling appearance
-    if (this.y >= (height + 20)) {//if y value is more than 20px off screen
-      if (!end) { //if a key has not been pressed
-        this.y = 0;//send it to the top
-      }else if (!message) { //if this is not the final message
-        this.value = " ";
-      }
-    } else if (message && this.y > height/2){ //if the message has been created and the stream is past halfway
-      //set the symbols value to the appropriate character of the message
-    } else {
-      this.y += speed; //lower y coordinate by the speed
-    }
+    this.y = (this.y >= height) ? 0 : this.y += this.speed;
   }
 }
-
 function Stream() {
   this.symbols = [];//create symbols array
-  if (create_message) {
-    this.totalSymbols = 1;//message should only have one symbol
-  } else {
-    this.totalSymbols = round(random(5, 35));//matrix shoud have a random number
-  }
+  this.totalSymbols = round(random(5, 35));//matrix shoud have a random number
   this.speed = random(5, 15);//random speed
 
   this.generateSymbols = function(x, y) {
@@ -153,7 +145,6 @@ function Stream() {
   }
 }
 
-function keyPressed() {//if key pressed, set variables to true
-  end = true;
-  create_message = true;
+function reset() {
+  streams = [];
 }
