@@ -50,12 +50,7 @@ function draw() {
       x += symbolSize;//shifts to the right
     }
     create_message = false;//message created so set to false
-  }
-
-  for (var i = 0; i < streams.length;i++) { //just for debugging purposes
-    if (end && !create_message) {
-      console.log(streams[i]);
-    }
+    message = true;
   }
   for (var i = 0; i < streams.length;i++) {//renders each stream
     streams[i].render();//render code CAUSES ERROR
@@ -76,9 +71,6 @@ function Symbol(x, y, speed, first, opacity) {
   this.setToRandomSymbol = function() {
     var charType = round(random(0, 7)); //creates a random int between 0 and 7
     if (frameCount % this.switchInterval == 0) {
-      if (end && !create_message) {//debugging again
-        console.log("assigning value");
-      }
       if (charType > 3) {
         // set it to Russian
         this.value = String.fromCharCode(
@@ -100,13 +92,15 @@ function Symbol(x, y, speed, first, opacity) {
     if (this.y >= (height + 20)) {//if y value is more than 20px off screen
       if (!end) { //if a key has not been pressed
         this.y = 0;//send it to the top
-      }else if (!message) { //if this is not the final message
+        this.setToRandomSymbol();
+      } else if (!message) { //if this is not the final message
         this.value = " ";
+      } else {
+        this.value = "a";
       }
-    } else if (message && this.y > height/2){ //if the message has been created and the stream is past halfway
-      //set the symbols value to the appropriate character of the message
     } else {
       this.y += speed; //lower y coordinate by the speed
+      this.setToRandomSymbol();
     }
   }
 }
@@ -148,7 +142,6 @@ function Stream() {
       }
       text(symbol.value, symbol.x, symbol.y);//show symbol as text
       symbol.rain();//lower and create loop effect;
-      symbol.setToRandomSymbol();//change to different symbols
     });
   }
 }
