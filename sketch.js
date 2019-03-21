@@ -1,11 +1,9 @@
 //MUST get values from slider and update reset function
 //also introduce end function
-//finally implement message 
-
-
+//finally implement message
 var streams = []; //creating streams array
-var fadeInterval = 1.6; //reduces opacity over time
-var symbolSize = 20; //font size
+let fadeInterval; //reduces opacity over time
+var symbolSize; //font size
 
 let fadeSlider;
 let symbolSizeSlider;
@@ -14,13 +12,10 @@ let minSymbolSlider;
 let minSpeedSlider;
 let maxSpeedSlider;
 
-function setup() {
-  createCanvas(
-    window.innerWidth,
-    window.innerHeight
-  ); //creates background fullscreen
-  background(0); //black background
-
+function start() {
+  //creating sliders
+  //slider arguments: min, max, default, discrete
+  //if discrete is 0 slider is continuous, 1 by default means discrete
   fadeSlider = createSlider(1, 4, 2, 0);
   fadeSlider.position(20,20);
   symbolSizeSlider = createSlider(5,40,20,0);
@@ -48,7 +43,7 @@ function setup() {
   button = createButton('reset');
   button.position(20, 195);
   button.mousePressed(reset);
-
+  symbolSize = symbolSizeSlider.value();
   var x = 0; //first stream all the way over on far left
   for (var i = 0; i <= width / symbolSize; i++) { //width divided by symbolSize is number of Streams that will be created
     var stream = new Stream();//initialises new stream object
@@ -59,10 +54,15 @@ function setup() {
 
   textFont('Consolas');
   textSize(symbolSize);
+}
 
-  //creating sliders
-  //slider arguments: min, max, default, discrete
-  //if discrete is 0 slider is continuous, 1 by default means discrete
+function setup() {
+  createCanvas(
+    window.innerWidth,
+    window.innerHeight
+  ); //creates background fullscreen
+  background(0); //black background
+  start();
 }
 
 function draw() {
@@ -109,8 +109,8 @@ function Symbol(x, y, speed, first, opacity) {
 }
 function Stream() {
   this.symbols = [];//create symbols array
-  this.totalSymbols = round(random(5, 35));//matrix shoud have a random number
-  this.speed = random(5, 15);//random speed
+  this.totalSymbols = round(random(minSymbolSlider.value(), maxSymbolSlider.value()));//matrix shoud have a random number
+  this.speed = random(minSpeedSlider.value(), maxSpeedSlider.value());//random speed
 
   this.generateSymbols = function(x, y) {
     var opacity = 255;
@@ -125,7 +125,9 @@ function Stream() {
       ); //initialise new symbols
       symbol.setToRandomSymbol();//set symbol to have a random value
       this.symbols.push(symbol);//add symbol to array
+      fadeInterval = fadeSlider.value();
       opacity -= (255 / this.totalSymbols) / fadeInterval; //reduce opacity each time by factor of the fadeInterval
+      symbolSize = symbolSizeSlider.value();
       y -= symbolSize;//symbol is moved up by the symbol size, first should be lowest down
       first = false;//first is automatically false for all other symbols apart from first one
     }
@@ -147,4 +149,5 @@ function Stream() {
 
 function reset() {
   streams = [];
+  start();
 }
