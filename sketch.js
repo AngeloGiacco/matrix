@@ -13,21 +13,51 @@ let minSpeedSlider;
 let maxSpeedSlider;
 
 function start() {
+  symbolSize = symbolSizeSlider.value();
+  var x = 0; //first stream all the way over on far left
+  for (var i = 0; i <= width / symbolSize; i++) { //width divided by symbolSize is number of Streams that will be created
+    var stream = new Stream();//initialises new stream object
+    stream.generateSymbols(x, random(0, height));//generates a symbol at the x position and random height
+    streams.push(stream);//adds stream to stream array
+    x += symbolSize;//moves to the right
+  }
+
+  textFont('Consolas');
+}
+
+function setup() {
+  createCanvas(
+    window.innerWidth,
+    window.innerHeight
+  ); //creates background fullscreen
+  background(0); //black background
   //creating sliders
   //slider arguments: min, max, default, discrete
   //if discrete is 0 slider is continuous, 1 by default means discrete
-  fadeSlider = createSlider(1, 4, 2, 0);
+  fadeSlider = createSlider(0.5, 2, 1, 0);
   fadeSlider.position(20,20);
-  symbolSizeSlider = createSlider(5,40,20,0);
+  symbolSizeSlider = createSlider(18,40,20,0);
   symbolSizeSlider.position(20,50);
-  minSymbolSlider = createSlider(10,25,20,1);
+  minSymbolSlider = createSlider(1,15,8,1);
   minSymbolSlider.position(20,80);
-  maxSymbolSlider = createSlider(1,9,5,1);
+  maxSymbolSlider = createSlider(15,25,20,1);
   maxSymbolSlider.position(20,110);
-  minSpeedSlider = createSlider(2,6,4,0,);
+  minSpeedSlider = createSlider(1,5,3,0);
   minSpeedSlider.position(20,140);
-  maxSpeedSlider = createSlider(8,20,15,0);
+  maxSpeedSlider = createSlider(6,15,10,0);
   maxSpeedSlider.position(20,170);
+  button = createButton('reset');
+  button.position(20, 195);
+  button.mousePressed(reset);
+  start();
+}
+
+function draw() {
+  background(0, 150);
+  streams.forEach(function(stream) {
+    stream.render();
+  });
+  textSize(18);
   fill(255);
   text("fade interval", fadeSlider.x * 2 + fadeSlider.width, 35);
   fill(255);
@@ -40,36 +70,7 @@ function start() {
   text("min speed", minSpeedSlider.x * 2 + minSpeedSlider.width, 155);
   fill(255);
   text("max speed", maxSpeedSlider.x * 2 + maxSpeedSlider.width, 185);
-  button = createButton('reset');
-  button.position(20, 195);
-  button.mousePressed(reset);
-  symbolSize = symbolSizeSlider.value();
-  var x = 0; //first stream all the way over on far left
-  for (var i = 0; i <= width / symbolSize; i++) { //width divided by symbolSize is number of Streams that will be created
-    var stream = new Stream();//initialises new stream object
-    stream.generateSymbols(x, random(0, height));//generates a symbol at the x position and random height
-    streams.push(stream);//adds stream to stream array
-    x += symbolSize;//moves to the right
-  }
-
-  textFont('Consolas');
   textSize(symbolSize);
-}
-
-function setup() {
-  createCanvas(
-    window.innerWidth,
-    window.innerHeight
-  ); //creates background fullscreen
-  background(0); //black background
-  start();
-}
-
-function draw() {
-  background(0, 150);
-  streams.forEach(function(stream) {
-    stream.render();
-  });
 }
 
 function Symbol(x, y, speed, first, opacity) {
