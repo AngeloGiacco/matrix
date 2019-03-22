@@ -11,6 +11,16 @@ let maxSymbolSlider;
 let minSymbolSlider;
 let minSpeedSlider;
 let maxSpeedSlider;
+var end = false;
+
+function check_symbol_remains() {
+  for (var i = 0; i < streams.length; i++) {
+    if (streams[i].symbols[streams[i].symbols.length - 1].value != " ") { //checks if any strings still have elements
+      return true;//returns true if symbols remain
+    }
+  }
+  return false;//if nothing returned, no symbols, returns false
+}
 
 function start() {
   symbolSize = symbolSizeSlider.value();
@@ -46,12 +56,13 @@ function setup() {
   minSpeedSlider.position(20,140);
   maxSpeedSlider = createSlider(6,15,10,0);
   maxSpeedSlider.position(20,170);
-  cb = createCheckbox('', false);
-  cb.position(20,200);
+  checkbox =  createInput(0,1,0);
+  checkbox.attribute("type","checkbox");
+  checkbox.attribute('checked', null);
+  checkbox.position(20,200)
   fill(255);
   textSize(18);
   text("end function",30,200);
-  console.log("end function");
   textSize(symbolSizeSlider.value());
   button = createButton('reset');
   button.position(20, 230);
@@ -78,6 +89,11 @@ function draw() {
   fill(255);
   text("max speed", maxSpeedSlider.x * 2 + maxSpeedSlider.width, 185);
   textSize(symbolSize);
+
+  if (checkbox.elt.checked) {
+    end = true;
+    console.log("checked");
+  }
 }
 
 function Symbol(x, y, speed, first, opacity) {
@@ -112,9 +128,18 @@ function Symbol(x, y, speed, first, opacity) {
   }
 
   this.rain = function() {//causes the falling appearance
-    this.y = (this.y >= height) ? 0 : this.y += this.speed;
+    if (this.y >= (height + symbolSizeSlider.value() + 1)) {//if y value is more than 20px off screen
+      if (!end) { //if a key has not been pressed
+        this.y = 0;//send it to the top
+      } else{ //if this is not the final message
+        this.value = " ";
+      }
+    } else {
+      this.y += speed; //lower y coordinate by the speed
+    }
   }
 }
+
 function Stream() {
   this.symbols = [];//create symbols array
   this.totalSymbols = round(random(minSymbolSlider.value(), maxSymbolSlider.value()));//matrix shoud have a random number
@@ -156,6 +181,7 @@ function Stream() {
 }
 
 function reset() {
+  end = false;
   streams = [];
   start();
 }
