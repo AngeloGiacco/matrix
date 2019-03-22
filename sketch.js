@@ -46,8 +46,15 @@ function setup() {
   minSpeedSlider.position(20,140);
   maxSpeedSlider = createSlider(6,15,10,0);
   maxSpeedSlider.position(20,170);
+  cb = createCheckbox('', false);
+  cb.position(20,200);
+  fill(255);
+  textSize(18);
+  text("end function",30,200);
+  console.log("end function");
+  textSize(symbolSizeSlider.value());
   button = createButton('reset');
-  button.position(20, 195);
+  button.position(20, 230);
   button.mousePressed(reset);
   start();
 }
