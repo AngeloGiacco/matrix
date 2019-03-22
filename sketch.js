@@ -61,7 +61,6 @@ function Symbol(x, y, speed, first, opacity) {
   this.x = x;//initialises Symbol attributes
   this.y = y;
   this.value;
-
   this.speed = speed;
   this.first = first;
   this.opacity = opacity;
@@ -95,7 +94,7 @@ function Symbol(x, y, speed, first, opacity) {
         this.setToRandomSymbol();
       } else if (!message) { //if this is not the final message
         this.value = " ";
-      } else {
+      } else if (this.y >= height / 2){
         this.value = "a";
       }
     } else {
