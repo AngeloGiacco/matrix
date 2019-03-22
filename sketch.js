@@ -56,13 +56,9 @@ function setup() {
   minSpeedSlider.position(20,140);
   maxSpeedSlider = createSlider(6,15,10,0);
   maxSpeedSlider.position(20,170);
-  checkbox =  createInput(0,1,0);
+  checkbox =  createInput(0,1,1);
   checkbox.attribute("type","checkbox");
-  checkbox.attribute('checked', null);
   checkbox.position(20,200)
-  fill(255);
-  textSize(18);
-  text("end function",30,200);
   textSize(symbolSizeSlider.value());
   button = createButton('reset');
   button.position(20, 230);
@@ -88,8 +84,9 @@ function draw() {
   text("min speed", minSpeedSlider.x * 2 + minSpeedSlider.width, 155);
   fill(255);
   text("max speed", maxSpeedSlider.x * 2 + maxSpeedSlider.width, 185);
+  fill(255);
+  text("end",50,213);
   textSize(symbolSize);
-
   if (checkbox.elt.checked) {
     end = true;
     console.log("checked");
