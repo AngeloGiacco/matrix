@@ -89,7 +89,6 @@ function draw() {
   textSize(symbolSize);
   if (checkbox.elt.checked) {
     end = true;
-    console.log("checked");
   }
 }
 
